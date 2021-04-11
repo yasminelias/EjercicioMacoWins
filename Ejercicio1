@@ -1,0 +1,77 @@
+
+class Prenda {
+	const tipo
+	var property estado
+	var property precio
+	const valorPromocion
+	
+	method precioVenta() = estado.precio(self)
+	
+}
+
+object nueva {
+	method precio(prenda) = prenda.precio()
+}
+
+object promocion {
+	
+	method precio(prenda) = prenda.precio() - prenda.valorPromocion()
+}
+
+object liquidacion {
+	
+	method precio(prenda) = prenda.precio() * 0.5
+}
+
+class Venta {
+	var property fecha
+	var property metodoPago
+	var property cuotas
+	const recargoCuota = 0.3
+	var property prendas = {}
+	
+	method totalVendido() = prendas.sum({ prenda => prenda.precioVenta()})
+	
+	method cantidadPrendas() = prendas.length()
+	
+	method precioFinal() =  self.totalVendido() + metodoPago.recargo()
+	
+}
+
+object efectivo inherits Venta{
+	
+	method recargo() = 0
+}
+
+object tarjeta inherits Venta{
+	
+	method recargo(){
+		if (cuotas == "0")
+			 0
+		else 
+			cuotas * recargoCuota + 0.01 * self.totalVendido()
+	}
+}
+
+
+object Macowins {
+	var property listaVentas = {}
+	
+	method registrarVenta(venta){
+		listaVentas.add(
+			new Venta (
+				fecha = new Date (),
+				precio= venta.precioFinal(),
+				metodoPago = venta.metodoPago(),
+				cuotas= venta.cuotas(),
+				prendas= venta.prendas(),
+				cantidad = venta.cantidadPrendas()
+				)
+		)
+	}
+	
+	method gananciasDelDia(fecha){
+		listaVentas.sum().map({venta=>venta.precio()}).filter({venta=>venta.fecha()})
+	}
+	
+}
